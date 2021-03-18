@@ -36,7 +36,7 @@ ChatLogic::~ChatLogic()
     delete _chatBot;
 
     // delete all nodes
-    // vector of unique pointers automatically gets deallocated
+    // vectors of unique pointers automatically gets deallocated
     /*for (auto it = std::begin(_nodes); it != std::end(_nodes); ++it)
     {
         delete *it;
@@ -133,7 +133,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                         // create new element if ID does not yet exist
                         if (newNode == _nodes.end())
                         {
-                            _nodes.emplace_back(std::make_unique<GraphNode>(id));
+                            _nodes.push_back(std::make_unique<GraphNode>(id));
                             newNode = _nodes.end() - 1; // get iterator to last element
 
                             // add all answers to current node
@@ -164,7 +164,8 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                             std::unique_ptr<GraphEdge> edge = std::make_unique<GraphEdge>(id);
                             edge->SetChildNode(childNode->get());
                             edge->SetParentNode(parentNode->get());
-                            _edges.push_back(edge.get());
+                            // removed to pass ownership of edge to GraphNode
+                            //_edges.push_back(edge);
 
                             // find all keywords for current node
                             AddAllTokensToElement("KEYWORD", tokens, *edge);
@@ -216,10 +217,12 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
             }
         }
     }
-
-    // add chatbot to graph root node
-    _chatBot->SetRootNode(rootNode);
-    rootNode->MoveChatbotHere(_chatBot);
+	
+    // add chatbot object to stack
+    ChatBot chatBot;
+    chatBot.SetRootNode(rootNode);
+    chatBot.SetChatLogicHandle(this);
+    rootNode->MoveChatbotHere(std::move(chatBot)); // move semantics on the chatBot object
     
     ////
     //// EOF STUDENT CODE

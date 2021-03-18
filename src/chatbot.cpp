@@ -30,18 +30,22 @@ ChatBot::ChatBot(std::string filename)
     _image = new wxBitmap(filename, wxBITMAP_TYPE_PNG);
 }
 
-// deep copy of chatbot
+// copy constructor
 ChatBot::ChatBot(ChatBot &source) 
 {
   	std::cout << "ChatBot Copy Constructor" << std::endl;
     
-  	// invalidate data handles
+    // invalidate data handles
+  	_image = nullptr;
     _chatLogic = nullptr;
     _rootNode = nullptr;
+  	_currentNode = nullptr;
     
-    // create new memory handle on the heap and copy the source image
-    _image = new wxBitmap();
-	*_image = *source._image;
+    // copy the source object
+    _image = source._image;
+  	_rootNode = source._rootNode;
+  	_currentNode = source._currentNode;
+  	_chatLogic = source._chatLogic;
 }
 
 // overload copy assignment operator
@@ -50,12 +54,17 @@ ChatBot& ChatBot::operator=(ChatBot &source)
     std::cout << "ChatBot Copy Assignment Operator" << std::endl;
 	
     // invalidate data handles
+  	_image = nullptr;
     _chatLogic = nullptr;
     _rootNode = nullptr;
+  	_currentNode = nullptr;
     
-    // create new memory handle on the heap and copy the source image
-    _image = new wxBitmap();
-	*_image = *source._image;
+    // copy the source object
+    _image = source._image;
+  	_rootNode = source._rootNode;
+  	_currentNode = source._currentNode;
+  	_chatLogic = source._chatLogic;
+
     return *this;
 }
 
@@ -63,18 +72,17 @@ ChatBot& ChatBot::operator=(ChatBot &source)
 ChatBot::ChatBot(ChatBot &&source) 
 {
   	std::cout << "ChatBot Move Constructor" << std::endl;
-    
-    // invalidate data handles
-    _chatLogic = nullptr;
-    _rootNode = nullptr;
-    
+        
     // copy handle to source address
     _image = source._image;
-	*_image = *source._image;
-  	
-  	// invalidate source data handles
+  	_rootNode = source._rootNode;
+  	_chatLogic = source._chatLogic;
+  	_chatLogic->SetChatbotHandle(this);
+    
+    // invalidate source data handles
     source._image = nullptr;
     source._chatLogic = nullptr;
+  	source._currentNode = nullptr;
     source._rootNode = nullptr;
 }
 
@@ -89,15 +97,24 @@ ChatBot& ChatBot::operator=(ChatBot &&source)
     // invalidate data handles
     _chatLogic = nullptr;
     _rootNode = nullptr;
+  	_currentNode = nullptr;
+    _image = nullptr;
     
     delete _image;
+  	delete _currentNode;
+    delete _rootNode;
+    delete _chatLogic;
     
     // copy handle to source address
     _image = source._image;
-	*_image = *source._image;
+  	_rootNode = source._rootNode;
+  	_chatLogic = source._chatLogic;
+  	_chatLogic->SetChatbotHandle(this);
+  
     // invalidate the source
     source._image = nullptr;
     source._chatLogic = nullptr;
+  	source._currentNode = nullptr;
     source._rootNode = nullptr;
   
     return *this;
@@ -112,6 +129,24 @@ ChatBot::~ChatBot()
     {
         delete _image;
         _image = NULL;
+    }
+  
+    if(_rootNode != nullptr) 
+    {
+        delete _rootNode;
+        _rootNode = nullptr;
+    }
+  
+  	if(_chatLogic != nullptr) 
+    {
+      	delete _chatLogic;
+      	_chatLogic = nullptr;
+    }
+  
+  	if(_currentNode != nullptr) 
+    {
+     	delete _chatLogic;
+      	_chatLogic = nullptr;
     }
 }
 
@@ -158,7 +193,7 @@ void ChatBot::SetCurrentNode(GraphNode *node)
     std::vector<std::string> answers = _currentNode->GetAnswers();
     std::mt19937 generator(int(std::time(0)));
     std::uniform_int_distribution<int> dis(0, answers.size() - 1);
-    std::string answer = answers.at(dis(generator));
+    std::string answer = answers.at(dis(generator));    
 
     // send selected node answer to user
     _chatLogic->SendMessageToUser(answer);
