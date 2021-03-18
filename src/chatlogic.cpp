@@ -17,12 +17,8 @@ ChatLogic::ChatLogic()
     //// STUDENT CODE
     ////
 
-    // create instance of chatbot
-    _chatBot = new ChatBot("../images/chatbot.png");
-
-    // add pointer to chatlogic so that chatbot answers can be passed on to the GUI
-    _chatBot->SetChatLogicHandle(this);
-
+    // remove instantiation of chatbot on the heap
+  
     ////
     //// EOF STUDENT CODE
 }
@@ -32,21 +28,16 @@ ChatLogic::~ChatLogic()
     //// STUDENT CODE
     ////
 
-    // delete chatbot instance
-    delete _chatBot;
-
-    // delete all nodes
+    // remove delete because chatBot is now created on the stack and not the heap
+	// delete _chatBot
+  
     // vectors of unique pointers automatically gets deallocated
     /*for (auto it = std::begin(_nodes); it != std::end(_nodes); ++it)
     {
         delete *it;
     }*/
-
-    // delete all edges
-    /*for (auto it = std::begin(_edges); it != std::end(_edges); ++it)
-    {
-        delete *it;
-    }*/
+  
+  	// edges are only added to GraphNode
 
     ////
     //// EOF STUDENT CODE
@@ -219,7 +210,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
     }
 	
     // add chatbot object to stack
-    ChatBot chatBot;
+    ChatBot chatBot("../images/chatbot.png");
     chatBot.SetRootNode(rootNode);
     chatBot.SetChatLogicHandle(this);
     rootNode->MoveChatbotHere(std::move(chatBot)); // move semantics on the chatBot object

@@ -35,16 +35,9 @@ ChatBot::ChatBot(ChatBot &source)
 {
   	std::cout << "ChatBot Copy Constructor" << std::endl;
     
-    // invalidate data handles
-  	_image = nullptr;
-    _chatLogic = nullptr;
-    _rootNode = nullptr;
-  	_currentNode = nullptr;
-    
     // copy the source object
     _image = source._image;
   	_rootNode = source._rootNode;
-  	_currentNode = source._currentNode;
   	_chatLogic = source._chatLogic;
 }
 
@@ -52,17 +45,10 @@ ChatBot::ChatBot(ChatBot &source)
 ChatBot& ChatBot::operator=(ChatBot &source)
 {
     std::cout << "ChatBot Copy Assignment Operator" << std::endl;
-	
-    // invalidate data handles
-  	_image = nullptr;
-    _chatLogic = nullptr;
-    _rootNode = nullptr;
-  	_currentNode = nullptr;
-    
+	    
     // copy the source object
     _image = source._image;
   	_rootNode = source._rootNode;
-  	_currentNode = source._currentNode;
   	_chatLogic = source._chatLogic;
 
     return *this;
@@ -82,7 +68,6 @@ ChatBot::ChatBot(ChatBot &&source)
     // invalidate source data handles
     source._image = nullptr;
     source._chatLogic = nullptr;
-  	source._currentNode = nullptr;
     source._rootNode = nullptr;
 }
 
@@ -93,17 +78,8 @@ ChatBot& ChatBot::operator=(ChatBot &&source)
     
   	if (this == &source)
     	return *this;
-  
-    // invalidate data handles
-    _chatLogic = nullptr;
-    _rootNode = nullptr;
-  	_currentNode = nullptr;
-    _image = nullptr;
     
     delete _image;
-  	delete _currentNode;
-    delete _rootNode;
-    delete _chatLogic;
     
     // copy handle to source address
     _image = source._image;
@@ -114,7 +90,6 @@ ChatBot& ChatBot::operator=(ChatBot &&source)
     // invalidate the source
     source._image = nullptr;
     source._chatLogic = nullptr;
-  	source._currentNode = nullptr;
     source._rootNode = nullptr;
   
     return *this;
@@ -129,24 +104,6 @@ ChatBot::~ChatBot()
     {
         delete _image;
         _image = NULL;
-    }
-  
-    if(_rootNode != nullptr) 
-    {
-        delete _rootNode;
-        _rootNode = nullptr;
-    }
-  
-  	if(_chatLogic != nullptr) 
-    {
-      	delete _chatLogic;
-      	_chatLogic = nullptr;
-    }
-  
-  	if(_currentNode != nullptr) 
-    {
-     	delete _chatLogic;
-      	_chatLogic = nullptr;
     }
 }
 
